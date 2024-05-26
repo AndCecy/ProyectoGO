@@ -1,4 +1,4 @@
-.App {
+.Home {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -30,7 +30,7 @@ nav ul li {
   margin: 10px;
 }
 
-nav ul li a {
+nav ul li button {
   text-decoration: none;
   color: black;
   display: inline-block;
@@ -40,10 +40,13 @@ nav ul li a {
   text-align: center;
   border-radius: 8px;
   background-color: darkturquoise; /* Button background color */
+  border: none; /* Remove border */
+  cursor: pointer; /* Change cursor on hover */
   transition: background-color 0.3s;
 }
 
-nav ul li a:hover {
+nav ul li button:hover {
   background-color: teal; /* Hover background color */
-  color: white; 
+  color: white;
 }
+
