@@ -15,6 +15,16 @@ const db = new sqlite3.Database('./data.db',(err) => {
     // Crea la tabla si no existe
     db.run('CREATE TABLE IF NOT EXISTS equipos ( id INTEGER PRIMARY KEY AUTOINCREMENT, fecha TEXT,numero_parte TEXT,numero_serie TEXT, nombre_impresora TEXT, problema TEXT, cliente TEXT, telefono TEXT)');
     db.run('CREATE TABLE IF NOT EXISTS accesorios (id INTEGER PRIMARY KEY AUTOINCREMENT, codigo TEXT, nombre TEXT, descripcion TEXT, unidad_de_medida TEXT, cantidad INTEGER)');
+    // Crear tabla suministros si no existe
+    db.run(`
+      CREATE TABLE IF NOT EXISTS suministros (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        codigo TEXT,
+        nombre TEXT,
+        unidad TEXT,
+        cantidad INTEGER
+      )
+    `);
   }
 });
 // Crear tabla si no existe
@@ -141,6 +151,58 @@ app.delete('/accesorios/:id', (req, res) => {
     }
   });
 });
+
+// Endpoint to add a new accessory
+app.post('/accesorios', (req, res) => {
+  const { codigo, nombre, descripcion, unidad_de_medida, cantidad } = req.body;
+  const sql = `INSERT INTO accesorios (codigo, nombre, descripcion, unidad_de_medida, cantidad) VALUES (?, ?, ?, ?, ?)`;
+  db.run(sql, [codigo, nombre, descripcion, unidad_de_medida, cantidad], function (err) {
+    if (err) {
+      console.error('Error al insertar datos:', err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    } else {
+      res.status(200).json({ id: this.lastID, codigo, nombre, descripcion, unidad_de_medida, cantidad });
+    }
+  });
+});
+
+// Endpoint to get all accessories
+app.get('/accesorios', (req, res) => {
+  db.all('SELECT * FROM accesorios', (err, rows) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Error interno del servidor');
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+app.get('/suministros', (req, res) => {
+  db.all('SELECT * FROM suministros', (err, rows) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Error interno del servidor');
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+app.post('/suministros', (req, res) => {
+  const { codigo, nombre, unidad, cantidad } = req.body;
+  const sql = 'INSERT INTO suministros (codigo, nombre, unidad, cantidad) VALUES (?, ?, ?, ?)';
+  db.run(sql, [codigo, nombre, unidad, cantidad], function (err) {
+    if (err) {
+      console.error('Error al insertar datos:', err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    } else {
+      console.log('Datos insertados correctamente');
+      res.status(200).json({ id: this.lastID, codigo, nombre, unidad, cantidad });
+    }
+  });
+});
+
 
 app.listen(port, () => {
   console.log(`Servidor escuchando en el puerto http://localhost:${port}`);
