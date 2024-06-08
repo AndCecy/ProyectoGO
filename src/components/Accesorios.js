@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Modal from 'react-modal';
 import '../estilos/Accesorios.css';
+
+Modal.setAppElement('#root'); // Necesario para accesibilidad
 
 function Accesorios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [accesorios, setAccesorios] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     codigo: '',
     nombre: '',
@@ -75,13 +78,21 @@ function Accesorios() {
           unidad_de_medida: 'und',
           cantidad: ''
         });
-        setShowForm(false);
+        setShowModal(false);
       } else {
         console.error('Error adding accesorio');
       }
     } catch (error) {
       console.error('Error adding accesorio:', error);
     }
+  };
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -96,55 +107,64 @@ function Accesorios() {
           onChange={handleSearchChange}
         />
         <button onClick={handleSearch}>Buscar</button>
-        <button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancelar' : 'Agregar Accesorio'}
+        <button onClick={openModal}>
+          Agregar Accesorio
         </button>
-        {showForm && (
-          <form onSubmit={handleAddAccesorio}>
-            <input
-              type="text"
-              name="codigo"
-              placeholder="Código"
-              value={formData.codigo}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="nombre"
-              placeholder="Nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="descripcion"
-              placeholder="Descripción"
-              value={formData.descripcion}
-              onChange={handleChange}
-            />
-            <select
-              name="unidad_de_medida"
-              value={formData.unidad_de_medida}
-              onChange={handleChange}
-              required
-            >
-              <option value="und">und</option>
-              <option value="ml">ml</option>
-            </select>
-            <input
-              type="number"
-              name="cantidad"
-              placeholder="Cantidad"
-              value={formData.cantidad}
-              onChange={handleChange}
-              required
-            />
-            <button type="submit">Agregar</button>
-          </form>
-        )}
       </div>
+      <Modal
+        isOpen={showModal}
+        onRequestClose={closeModal}
+        contentLabel="Agregar Accesorio"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>Agregar Accesorio</h2>
+        <form onSubmit={handleAddAccesorio}>
+          <input
+            type="text"
+            name="codigo"
+            placeholder="Código"
+            value={formData.codigo}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="nombre"
+            placeholder="Nombre"
+            value={formData.nombre}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="descripcion"
+            placeholder="Descripción"
+            value={formData.descripcion}
+            onChange={handleChange}
+          />
+          
+          <input
+            type="number"
+            name="cantidad"
+            placeholder="Cantidad"
+            value={formData.cantidad}
+            onChange={handleChange}
+            required
+          />
+          <select
+            name="unidad_de_medida"
+            value={formData.unidad_de_medida}
+            onChange={handleChange}
+            required
+          >
+            <option value="und">und</option>
+            <option value="ml">ml</option>
+          </select>
+          <button type="submit">Agregar</button>
+          <button type="button" onClick={closeModal}>Cancelar</button>
+        </form>
+      </Modal>
       <ul>
         {filteredAccesorios.map((accesorio) => (
           <li key={accesorio.id}>
@@ -157,5 +177,6 @@ function Accesorios() {
 }
 
 export default Accesorios;
+
 
 

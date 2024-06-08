@@ -1,12 +1,14 @@
-// Suministros.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Modal from 'react-modal';
 import '../estilos/Suministros.css';
+
+Modal.setAppElement('#root'); // Necesario para accesibilidad
 
 function Suministros() {
   const [searchTerm, setSearchTerm] = useState('');
   const [suministros, setSuministros] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     codigo: '',
     nombre: '',
@@ -74,13 +76,21 @@ function Suministros() {
           unidad: 'und',
           cantidad: ''
         });
-        setShowForm(false);
+        setShowModal(false);
       } else {
         console.error('Error adding suministro');
       }
     } catch (error) {
       console.error('Error adding suministro:', error);
     }
+  };
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -95,48 +105,57 @@ function Suministros() {
           onChange={handleSearchChange}
         />
         <button onClick={handleSearch}>Buscar</button>
-        <button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancelar' : 'Agregar Suministro'}
+        <button onClick={openModal}>
+          Agregar Suministro
         </button>
-        {showForm && (
-          <form onSubmit={handleAddSuministro}>
-            <input
-              type="text"
-              name="codigo"
-              placeholder="Código"
-              value={formData.codigo}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="nombre"
-              placeholder="Nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              required
-            />
-            <select
-              name="unidad"
-              value={formData.unidad}
-              onChange={handleChange}
-              required
-            >
-              <option value="und">und</option>
-              <option value="ml">ml</option>
-            </select>
-            <input
-              type="number"
-              name="cantidad"
-              placeholder="Cantidad"
-              value={formData.cantidad}
-              onChange={handleChange}
-              required
-            />
-            <button type="submit">Agregar</button>
-          </form>
-        )}
       </div>
+      <Modal
+        isOpen={showModal}
+        onRequestClose={closeModal}
+        contentLabel="Agregar Suministro"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+        <h2>Agregar Suministro</h2>
+        <form onSubmit={handleAddSuministro}>
+          <input
+            type="text"
+            name="codigo"
+            placeholder="Código"
+            value={formData.codigo}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="nombre"
+            placeholder="Nombre"
+            value={formData.nombre}
+            onChange={handleChange}
+            required
+          />
+          
+          <input
+            type="number"
+            name="cantidad"
+            placeholder="Cantidad"
+            value={formData.cantidad}
+            onChange={handleChange}
+            required
+          />
+          <select
+            name="unidad"
+            value={formData.unidad}
+            onChange={handleChange}
+            required
+          >
+            <option value="und">und</option>
+            <option value="ml">ml</option>
+          </select>
+          <button type="submit">Agregar</button>
+          <button type="button" onClick={closeModal}>Cancelar</button>
+        </form>
+      </Modal>
       <ul>
         {filteredSuministros.map((suministro) => (
           <li key={suministro.id}>
